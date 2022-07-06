@@ -146,7 +146,7 @@
             ?>
 
             <div style="text-align: center;">
-                <form action="/optiimizar_bases/index.php" method="post" enctype="multipart/form-data">
+                <form action="/optiimizar_bases/ProcesarArchivos.php" method="post" enctype="multipart/form-data">
                     <h2>Indique el archivo a procesar</h2>
                     <input type="file" name="archivo_procesar">
                     <br><br><h2>Limite de columnas a cargar</h2>
