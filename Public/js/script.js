@@ -104,11 +104,18 @@ function eventosIniciales()
 
     $("#formNuevaGestion #linea:not(.eventLinea)").addClass('eventLinea').change(mostrarOpcionesLinea);
     $("#formNuevaGestion #tipo:not(.eventTipo)").addClass('eventTipo').change(mostrarOpcionesTipo);
-    $("#formNuevaGestion #agente:not(.eventAgente)").addClass('eventAgente').select2()
+    $("#formNuevaGestion #agente:not(.eventAgente)").addClass('eventAgente');
+    if($("#formNuevaGestion #agente:not(.eventAgente)").length > 0){
+        $("#formNuevaGestion #agente:not(.eventAgente)").select2();
+    }
     $("#formNuevaGestion #select2-agente-container").closest('.select2').addClass('form-control');
 
     $("a.redirectjs:not(.eventRedirect)").addClass('eventRedirect').on("click", function (evt) {
         evt.preventDefault();
+        
+        $("#sidebar-nav").find('.nav-link').addClass('collapsed');
+        $(this).removeClass('collapsed');
+        
         return redirectjs(this);
     });
     $("form.redirectjs:not(.eventRedirect)").addClass('eventRedirect').on("submit", function (evt) {

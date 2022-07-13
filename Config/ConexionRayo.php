@@ -1,5 +1,7 @@
 <?php
 
+date_default_timezone_set('America/Bogota');
+
 class ConexionRayo {
 
     /*
@@ -47,8 +49,13 @@ class ConexionRayo {
     
     public function obtenerDatos($query)
     {
-        $object = $this->conexion->query($query);
-        return (!empty($object)) ? $object : [];
+        try{
+            $object = $this->conexion->query($query);
+            return (!empty($object)) ? $object : [];
+        }
+        catch(Exception $e){
+            echo "<pre>{$e->getMessage()}</pre>";
+        }
     }
     
     public function ejecutarDatos($query)
@@ -87,5 +94,48 @@ class ConexionRayo {
             INSERT INTO `gestion_rayo`(`fecha_registro`, `fecha_gestion`, `agente`, `cedula`, `linea`, `tipo`, `mora`, `recipiente`)
             VALUES ('".date('Y-m-d H:i:s')."', '{$arrayRegistros['fechaGestion']}', '{$arrayRegistros['agente']}', '{$arrayRegistros['cedula']}', '{$arrayRegistros['linea']}', '{$arrayRegistros['tipo']}', '{$arrayRegistros['mora']}', '{$arrayRegistros['repitentes']}')";
         return $this->ejecutarDatos($consqlInsert);
+    }
+    
+    public function cantidadGestionesHora()
+    {
+        $consqlSelect = "
+                    SELECT HOUR(fecha_registro) AS hora, COUNT(*) AS cantidad
+                    FROM gestion_rayo 
+                    WHERE fecha_registro >= CONCAT(CURDATE(), ' 00:00:00')
+                    GROUP BY hora";
+        $arrayDatos =  $this->obtenerDatos($consqlSelect);
+        
+        $arrayReturn = [];
+        foreach($arrayDatos as $dato){
+            $arrayReturn[$dato['hora']] = $dato['cantidad'];
+        }
+        return $arrayReturn;
+    }
+    
+    public function empleadosXGestiones()
+    {
+        $consqlSelect = "
+                    SELECT 
+                        COUNT(*) AS gestiones, 
+                        COUNT(DISTINCT(h.agente)) AS agentes_gestion, 
+                        (SELECT COUNT(*) FROM agente WHERE linea = 2) AS agentes_total
+                    FROM gestion_rayo h 
+                    WHERE h.fecha_registro >= CONCAT(CURDATE(), ' 00:00:00')";
+        $arrayDatos =  $this->obtenerDatos($consqlSelect);
+        return (empty($arrayDatos)) ? $arrayDatos : $arrayDatos->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    public function gestionesHoraLinea()
+    {
+        $consqlSelect = "
+                    SELECT 
+                        HOUR(fecha_registro) AS hora,
+                        linea AS name, 
+                        COUNT(*) AS data
+                    FROM gestion_rayo 
+                    WHERE 1 -- fecha_registro >= CONCAT(CURDATE(), ' 00:00:00')
+                    GROUP BY hora, linea";
+        $arrayDatos =  $this->obtenerDatos($consqlSelect);
+        return (empty($arrayDatos)) ? $arrayDatos : $arrayDatos->fetchAll(PDO::FETCH_ASSOC);
     }
 }

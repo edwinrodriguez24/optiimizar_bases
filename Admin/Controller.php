@@ -1,7 +1,5 @@
 <?php
 
-date_default_timezone_set('America/Bogota');
-
 include_once '../Config/ConexionRayo.php';
 
 $ConexionRayo = new ConexionRayo();
